@@ -353,3 +353,12 @@ footer a {
   color: green;
   margin-top: 1rem;
 }
+
+#orderSummary h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+#orderSummary li {
+  text-align: left;
+}

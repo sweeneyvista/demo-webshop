@@ -67,6 +67,7 @@
             Place Order
           </button>
         </form>
+        <div id="orderSummary" class="order-list" role="log" aria-live="polite"></div>
         <div id="successMsg" role="alert" aria-live="polite">
           Thank you for your order!
         </div>
@@ -86,8 +87,24 @@
       renderBasket();
       document.getElementById("checkoutForm").onsubmit = function (e) {
         e.preventDefault();
+        const name = document.getElementById('name').value;
+        const address = document.getElementById('address').value;
+        // 1. Get order details BEFORE clearing the basket
+        const order = getBasketWithDetails();
+        
+        // 2. Display Order Summary with quantities
+        document.getElementById('orderSummary').innerHTML = 
+          '<h2>Order Details:</h2>' + 
+          '<li>Name: <span>' + name + '</span></li>' + 
+          '<li>Address: <span>' + address + '</span></li>' + 
+          '<li>Items Ordered:</li>' + 
+          order.map(item => '<li><span class="basket-emoji">' + item.emoji + '</span> ' + item.name + ' x' + item.quantity + '</li>').join('');
+        
+        // 3. Show success and hide form
         document.getElementById("successMsg").style.display = "block";
         document.getElementById("checkoutForm").style.display = "none";
+        
+        // 4. Clear basket after summary is ready
         clearBasket();
         renderBasket();
       };
