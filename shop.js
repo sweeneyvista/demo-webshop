@@ -42,27 +42,68 @@ function getBasketWithDetails() {
   return summary;
 }
 
+function removeFromBasket(productKey) {
+  const basket = getBasket();
+  if (basket[productKey]) {
+    delete basket[productKey];
+  }
+  localStorage.setItem("basket", JSON.stringify(basket));
+  renderBasket();
+  renderBasketIndicator();
+}
+
 function renderBasket() {
   const basketDetails = getBasketWithDetails();
   const basketList = document.getElementById("basketList");
   const cartButtonsRow = document.querySelector(".cart-buttons-row");
   if (!basketList) return;
   basketList.innerHTML = "";
-  
-  if (basketDetails.length === 0) { // Check length of the details array
+
+  if (basketDetails.length === 0) {
     basketList.innerHTML = "<li>No products in basket.</li>";
     if (cartButtonsRow) cartButtonsRow.style.display = "none";
     return;
   }
-  
-  basketDetails.forEach((item) => { // Use the details array
+
+  basketDetails.forEach((item) => {
     const li = document.createElement("li");
-    // Display the quantity
-    li.innerHTML = `<span class='basket-emoji'>${item.emoji}</span> <span>${item.name} x${item.quantity}</span>`;
+    li.innerHTML = `<span class='basket-emoji'>${item.emoji}</span> <span>${item.name} x${item.quantity}</span><span class="remove-item" data-product-key="${item.key}">Remove</span>`;
     basketList.appendChild(li);
   });
-  
+
   if (cartButtonsRow) cartButtonsRow.style.display = "flex";
+
+  const modal = document.getElementById("confirmationModal");
+  const confirmYes = document.getElementById("confirmYes");
+  const confirmNo = document.getElementById("confirmNo");
+  let productKeyToRemove = null;
+
+  document.querySelectorAll(".remove-item").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      productKeyToRemove = e.target.dataset.productKey;
+      modal.style.display = "block";
+    });
+  });
+
+  confirmYes.onclick = function () {
+    if (productKeyToRemove) {
+      removeFromBasket(productKeyToRemove);
+      productKeyToRemove = null;
+    }
+    modal.style.display = "none";
+  };
+
+  confirmNo.onclick = function () {
+    productKeyToRemove = null;
+    modal.style.display = "none";
+  };
+
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      productKeyToRemove = null;
+      modal.style.display = "none";
+    }
+  };
 }
 
 function renderBasketIndicator() {
